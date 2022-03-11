@@ -29,11 +29,11 @@
  * Modifications Copyright OpenSearch Contributors. See
  * GitHub history for details.
  */
-import React from 'react';
 import { i18n } from '@osd/i18n';
 import { mapToLayerWithId } from './util';
 import { createRegionMapVisualization } from './region_map_visualization';
 import { RegionMapOptions } from './components/region_map_options';
+import { CustomVectorUpload } from './components/custom_vector_upload';
 import { truncatedColorSchemas } from '../../charts/public';
 import { Schemas } from '../../vis_default_editor/public';
 import { ORIGIN } from '../../maps_legacy/public';
@@ -67,9 +67,22 @@ provided base maps, or add your own. Darker colors represent higher values.',
     },
     visualization,
     editorConfig: {
-      optionsTemplate: (props) => (
-        <RegionMapOptions {...props} getServiceSettings={getServiceSettings} />
-      ),
+      optionTabs: [
+        {
+          name: 'controls',
+          title: i18n.translate('regionMap.mapVis.regionMapEditorConfig.optionTabs.controlsTitle', {
+            defaultMessage: 'Import Vector Map',
+          }),
+          editor: CustomVectorUpload,
+        },
+        {
+          name: 'options',
+          title: i18n.translate('regionMap.mapVis.regionMapEditorConfig.optionTabs.optionsTitle', {
+            defaultMessage: 'Layer Options',
+          }),
+          editor: RegionMapOptions,
+        },
+      ],
       collections: {
         colorSchemas: truncatedColorSchemas,
         vectorLayers: [],
