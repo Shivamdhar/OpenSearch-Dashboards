@@ -5,6 +5,7 @@
 
 import { UPLOAD_GEOJSON_API } from '../../common/constants/shared';
 
+// eslint-disable-next-line import/no-default-export
 export default function GeoPlugin(Client, config, components) {
   const ca = components.clientAction.factory;
   Client.prototype.geo = components.clientAction.namespaceFactory();

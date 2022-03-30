@@ -5,6 +5,7 @@
 
 import { schema } from '@osd/config-schema';
 
+// eslint-disable-next-line import/no-default-export
 export default function (services, router) {
   router.post(
     {
