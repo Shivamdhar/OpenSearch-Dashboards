@@ -1,9 +1,17 @@
 /*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/*
  * SPDX-License-Identifier: Apache-2.0
  *
  * The OpenSearch Contributors require contributions made to
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
+ *
+ * Any modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
  */
 
 /*
@@ -25,25 +33,8 @@
  * under the License.
  */
 
-/*
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
- */
-
 import React, { useCallback, useMemo } from 'react';
-import { useState, Fragment } from 'react';
-import {
-  EuiIcon,
-  EuiLink,
-  EuiPanel,
-  EuiSpacer,
-  EuiText,
-  EuiTitle,
-  EuiCheckableCard,
-  EuiRadioGroup,
-  EuiFormFieldset,
-} from '@elastic/eui';
-import { htmlIdGenerator } from '@elastic/eui/lib/services';
+import { EuiIcon, EuiLink, EuiPanel, EuiSpacer, EuiText, EuiTitle } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import { VisOptionsProps } from 'src/plugins/vis_default_editor/public';
@@ -69,7 +60,6 @@ function RegionMapOptions(props: RegionMapOptionsProps) {
   const { getServiceSettings, stateParams, vis, setValue } = props;
   const { vectorLayers } = vis.type.editorConfig.collections;
   const vectorLayerOptions = useMemo(() => vectorLayers.map(mapLayerForOption), [vectorLayers]);
-
   const fieldOptions = useMemo(
     () =>
       ((stateParams.selectedLayer && stateParams.selectedLayer.fields) || []).map(
@@ -112,19 +102,6 @@ function RegionMapOptions(props: RegionMapOptionsProps) {
     [setValue, stateParams.selectedLayer]
   );
 
-  const radioName = htmlIdGenerator()();
-  const [radio, setRadio] = useState('radio2');
-
-  const defaultVectorMap = function () {
-    setRadio('radio1');
-    document.getElementById('defaultVectorMapOptions').style.display = 'block';
-  };
-
-  const customVectorMap = function () {
-    setRadio('radio2');
-    document.getElementById('defaultVectorMapOptions').style.display = 'none';
-  };
-
   return (
     <>
       <EuiPanel paddingSize="s">
@@ -138,93 +115,53 @@ function RegionMapOptions(props: RegionMapOptionsProps) {
         </EuiTitle>
         <EuiSpacer size="s" />
 
-        <Fragment>
-          <EuiFormFieldset
-            legend={{
-              children: (
-                <EuiTitle size="xs">
-                  <span>Choose vector map layer</span>
-                </EuiTitle>
-              ),
-            }}
-          >
-            <EuiCheckableCard
-              layout="vertical"
-              id={htmlIdGenerator()()}
-              label="Default vector map"
-              name={radioName}
-              value="radio1"
-              checked={radio === 'radio1'}
-              onChange={() => defaultVectorMap()}
-            />
+        <SelectOption
+          id="regionMapOptionsSelectLayer"
+          label={i18n.translate('regionMap.visParams.vectorMapLabel', {
+            defaultMessage: 'Vector map',
+          })}
+          options={vectorLayerOptions}
+          paramName="selectedLayer"
+          value={stateParams.selectedLayer && stateParams.selectedLayer.layerId}
+          setValue={setLayer}
+        />
 
-            <EuiSpacer size="xl" />
+        <SelectOption
+          id="regionMapOptionsSelectJoinField"
+          label={i18n.translate('regionMap.visParams.joinFieldLabel', {
+            defaultMessage: 'Join field',
+          })}
+          options={fieldOptions}
+          paramName="selectedJoinField"
+          value={stateParams.selectedJoinField && stateParams.selectedJoinField.name}
+          setValue={setField}
+        />
 
-            <EuiCheckableCard
-              layout="vertical"
-              id={htmlIdGenerator()()}
-              label="Custom vector map"
-              name={radioName}
-              value="radio2"
-              checked={radio === 'radio2'}
-              onChange={() => customVectorMap()}
-            />
+        <SwitchOption
+          label={i18n.translate('regionMap.visParams.displayWarningsLabel', {
+            defaultMessage: 'Display warnings',
+          })}
+          tooltip={i18n.translate('regionMap.visParams.switchWarningsTipText', {
+            defaultMessage:
+              'Turns on/off warnings. When turned on, warning will be shown for each term that cannot be matched to a shape in the vector layer based on the join field. When turned off, these warnings will be turned off.',
+          })}
+          paramName="isDisplayWarning"
+          value={stateParams.isDisplayWarning}
+          setValue={setValue}
+        />
 
-            <EuiSpacer size="xl" />
-          </EuiFormFieldset>
-
-          <EuiSpacer size="xl" />
-        </Fragment>
-
-        <div style={{ display: 'none' }} id="defaultVectorMapOptions">
-          <SelectOption
-            id="regionMapOptionsSelectLayer"
-            label={i18n.translate('regionMap.visParams.vectorMapLabel', {
-              defaultMessage: 'Vector map',
-            })}
-            options={vectorLayerOptions}
-            paramName="selectedLayer"
-            value={stateParams.selectedLayer && stateParams.selectedLayer.layerId}
-            setValue={setLayer}
-          />
-
-          <SelectOption
-            id="regionMapOptionsSelectJoinField"
-            label={i18n.translate('regionMap.visParams.joinFieldLabel', {
-              defaultMessage: 'Join field',
-            })}
-            options={fieldOptions}
-            paramName="selectedJoinField"
-            value={stateParams.selectedJoinField && stateParams.selectedJoinField.name}
-            setValue={setField}
-          />
-
-          <SwitchOption
-            label={i18n.translate('regionMap.visParams.displayWarningsLabel', {
-              defaultMessage: 'Display warnings',
-            })}
-            tooltip={i18n.translate('regionMap.visParams.switchWarningsTipText', {
-              defaultMessage:
-                'Turns on/off warnings. When turned on, warning will be shown for each term that cannot be matched to a shape in the vector layer based on the join field. When turned off, these warnings will be turned off.',
-            })}
-            paramName="isDisplayWarning"
-            value={stateParams.isDisplayWarning}
-            setValue={setValue}
-          />
-
-          <SwitchOption
-            label={i18n.translate('regionMap.visParams.showAllShapesLabel', {
-              defaultMessage: 'Show all shapes',
-            })}
-            tooltip={i18n.translate('regionMap.visParams.turnOffShowingAllShapesTipText', {
-              defaultMessage:
-                'Turning this off only shows the shapes that were matched with a corresponding term.',
-            })}
-            paramName="showAllShapes"
-            value={stateParams.showAllShapes}
-            setValue={setValue}
-          />
-        </div>
+        <SwitchOption
+          label={i18n.translate('regionMap.visParams.showAllShapesLabel', {
+            defaultMessage: 'Show all shapes',
+          })}
+          tooltip={i18n.translate('regionMap.visParams.turnOffShowingAllShapesTipText', {
+            defaultMessage:
+              'Turning this off only shows the shapes that were matched with a corresponding term.',
+          })}
+          paramName="showAllShapes"
+          value={stateParams.showAllShapes}
+          setValue={setValue}
+        />
       </EuiPanel>
 
       <EuiSpacer size="s" />
